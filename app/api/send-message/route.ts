@@ -9,12 +9,18 @@ import {
 } from "@/types/types";
 import {
 	GET_CHATBOT_BY_ID,
-	GET_MESSAGES_BY_CAHT_SESSION_ID,
+	GET_MESSAGES_BY_CHAT_SESSION_ID,
 } from "@/graphql/queries/queries";
 import {ChatCompletionMessageParam} from "groq-sdk/resources/chat/completions.mjs";
 import {INSERT_MESSAGE} from "@/graphql/mutations/mutations";
 
 const groq = new Groq({apiKey: process.env.GROQ_KEY});
+
+const corsHeaders = {
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+	"Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
 export const POST = async (req: NextRequest) => {
 	const {chat_session_id, chatbot_id, content, name} = await req.json();
@@ -46,7 +52,7 @@ export const POST = async (req: NextRequest) => {
 			MessagesByChatSessionIdResponse,
 			MessagesByChatSessionIdVariables
 		>({
-			query: GET_MESSAGES_BY_CAHT_SESSION_ID,
+			query: GET_MESSAGES_BY_CHAT_SESSION_ID,
 			variables: {chat_session_id: chat_session_id},
 			fetchPolicy: "no-cache",
 		});
@@ -105,12 +111,19 @@ export const POST = async (req: NextRequest) => {
 		});
 
 		// Return AI's response back to the client
-		return NextResponse.json({
-			id: aiMessageResult.data.insertMessages.id,
-			content: aiResponse,
-		});
+		return NextResponse.json(
+			{
+				id: aiMessageResult.data.insertMessages.id,
+				content: aiResponse,
+			},
+			{headers: corsHeaders},
+		);
 	} catch (error) {
 		console.error("error sending message ", error);
 		return NextResponse.json({error}, {status: 500});
 	}
+};
+
+export const OPTIONS = async () => {
+	return NextResponse.json({}, {headers: corsHeaders});
 };

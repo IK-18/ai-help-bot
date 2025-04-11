@@ -24,7 +24,7 @@ import Avatar from "@/components/Avatar";
 import {useQuery} from "@apollo/client";
 import {
 	GET_CHATBOT_BY_ID,
-	GET_MESSAGES_BY_CAHT_SESSION_ID,
+	GET_MESSAGES_BY_CHAT_SESSION_ID,
 } from "@/graphql/queries/queries";
 import Messages from "@/components/Messages";
 import {z} from "zod";
@@ -73,7 +73,7 @@ const ChatbotPage = ({params}: {params: Promise<{id: string}>}) => {
 	} = useQuery<
 		MessagesByChatSessionIdResponse,
 		MessagesByChatSessionIdVariables
-	>(GET_MESSAGES_BY_CAHT_SESSION_ID, {
+	>(GET_MESSAGES_BY_CHAT_SESSION_ID, {
 		variables: {chat_session_id: chatId},
 		skip: !chatId,
 	});

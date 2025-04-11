@@ -44,7 +44,7 @@ const ChatbotSessions = ({chatbots}: {chatbots: Chatbot[]}) => {
 											/>
 											<div className='flex flex-1 justify-between space-x-'>
 												<p>{chatbot.name}</p>
-												<p className='pr- font-bold text-right'>
+												<p className='pr-4 font-bold text-right'>
 													{
 														chatbot.chat_sessions
 															.length

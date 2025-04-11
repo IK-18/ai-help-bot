@@ -5,6 +5,7 @@ import {
 	INSERT_GUEST,
 	INSERT_MESSAGE,
 } from "@/graphql/mutations/mutations";
+import {GET_CHATBOT_BY_ID} from "@/graphql/queries/queries";
 
 export const startNewChat = async (
 	guestName: string,
@@ -20,6 +21,11 @@ export const startNewChat = async (
 				email: guestEmail,
 			},
 		});
+
+		if (!guestResult.data?.insertGuests?.id) {
+			throw new Error("Failed to create guest");
+		}
+
 		const guestId = guestResult.data.insertGuests.id;
 
 		// Initialise a new chat session
@@ -29,6 +35,15 @@ export const startNewChat = async (
 		});
 		const chatSessionId = chatSessionResult.data.insertChat_sessions.id;
 
+		// Fetch chatbot to get welcome message
+		const {data} = await client.query({
+			query: GET_CHATBOT_BY_ID,
+			variables: {id: chatbotId},
+		});
+		const welcomeMessage =
+			data.chatbots.welcome_message ||
+			`Welcome ${guestName}!\n How can I assist you today?`;
+
 		// Insert initial message (Optional)
 		await client.mutate({
 			mutation: INSERT_MESSAGE,
@@ -36,7 +51,7 @@ export const startNewChat = async (
 				chat_session_id: chatSessionId,
 				sender: "ai",
 				// TODO: Change to be dynamic content that can be set by admin
-				content: `Welcome ${guestName}!\n How can I assist you today?`,
+				content: welcomeMessage,
 			},
 		});
 

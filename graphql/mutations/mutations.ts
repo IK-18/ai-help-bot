@@ -1,10 +1,22 @@
 import {gql} from "@apollo/client";
 
 export const CREATE_CHATBOT = gql`
-	mutation CreateChatbot($clerk_user_id: String!, $name: String!) {
-		insertChatbots(clerk_user_id: $clerk_user_id, name: $name) {
+	mutation CreateChatbot(
+		$clerk_user_id: String!
+		$name: String!
+		$welcome_message: String
+		$public_access: Boolean
+	) {
+		insertChatbots(
+			clerk_user_id: $clerk_user_id
+			name: $name
+			welcome_message: $welcome_message
+			public_access: $public_access
+		) {
 			id
 			name
+			welcome_message
+			public_access
 		}
 	}
 `;
@@ -41,12 +53,24 @@ export const ADD_CHARACTERISTIC = gql`
 `;
 
 export const UPDATE_CHATBOT = gql`
-	mutation UpdateChatbot($id: Int!, $name: String!) {
-		updateChatbots(id: $id, name: $name) {
+	mutation UpdateChatbot(
+		$id: Int!
+		$name: String!
+		$welcome_message: String
+		$public_access: Boolean
+	) {
+		updateChatbots(
+			id: $id
+			name: $name
+			welcome_message: $welcome_message
+			public_access: $public_access
+		) {
 			id
 			name
 			created_at
 			#  Add other fields you amy want to return after update
+			welcome_message
+			public_access
 		}
 	}
 `;

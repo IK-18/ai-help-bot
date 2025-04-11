@@ -33,6 +33,8 @@ type Chatbots {
 	created_at: DateTime!
 	id: Int!
 	name: String!
+	welcome_message: String
+	public_access: Boolean!
 }
 
 type Guests {
@@ -384,6 +386,8 @@ type Mutation {
 		created_at: DateTime
 		name: String!
 		clerk_user_id: String!
+		welcome_message: String
+		public_access: Boolean
 	): Chatbots
 		@dbquery(
 			type: "postgresql"
@@ -397,6 +401,8 @@ type Mutation {
 		clerk_user_id: String
 		created_at: DateTime
 		name: String
+		welcome_message: String
+		public_access: Boolean
 	): Chatbots
 		@dbquery(
 			type: "postgresql"
@@ -405,7 +411,9 @@ type Mutation {
 			UPDATE "chatbots" SET
 			  "clerk_user_id" = COALESCE($2, "clerk_user_id"),
 			  "created_at" = COALESCE($3, "created_at"),
-			  "name" = COALESCE($4, "name")
+			  "name" = COALESCE($4, "name"),
+			  "welcome_message" = COALESCE($5, "welcome_message"),
+			  "public_access" = COALESCE($6, "public_access")
 			WHERE
 			  "id" = $1
 			RETURNING *

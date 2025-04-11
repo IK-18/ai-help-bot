@@ -3,6 +3,8 @@ export interface Chatbot {
 	clerk_user_id: string;
 	name: string;
 	created_at: string;
+	welcome_message: string;
+	public_access: boolean;
 	chatbot_characteristics: ChatbotCharacteristic[];
 	chat_sessions: ChatSession[];
 }
@@ -85,4 +87,24 @@ export interface MessagesByChatSessionIdResponse {
 
 export interface MessagesByChatSessionIdVariables {
 	chat_session_id: number;
+}
+
+export interface APIError {
+	message: string;
+	code?: string;
+	details?: unknown;
+}
+
+export interface ChatbotConfig {
+	id: number;
+	name: string;
+	welcomeMessage: string;
+	theme?: {
+		primaryColor: string;
+		secondaryColor: string;
+	};
+}
+
+export interface EmbedInstructionsProps {
+	chatbotId: number;
 }

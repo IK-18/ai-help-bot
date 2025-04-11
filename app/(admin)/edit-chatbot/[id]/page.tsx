@@ -2,8 +2,11 @@
 
 import Avatar from "@/components/Avatar";
 import Characteristic from "@/components/Characteristic";
+import {EmbedInstructions} from "@/components/EmbedInstructions";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Switch} from "@/components/ui/switch";
 import {BASE_URL} from "@/graphql/apolloClient";
 import {
 	ADD_CHARACTERISTIC,
@@ -23,7 +26,9 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 	const {id} = use(params);
 	const [url, setUrl] = useState<string>("");
 	const [chatbotName, setChatbotName] = useState<string>("");
+	const [welcomeMessage, setWelcomeMessage] = useState<string>("");
 	const [newCharacteristic, setNewCharacteristic] = useState<string>("");
+	const [publicAccess, setPublicAccess] = useState<boolean>(false);
 	const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
 		refetchQueries: ["GetChatbotById"],
 		awaitRefetchQueries: true,
@@ -45,6 +50,11 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 	useEffect(() => {
 		if (data) {
 			setChatbotName(data.chatbots.name);
+			setWelcomeMessage(
+				data.chatbots.welcome_message ||
+					"Welcome! How can I assist you today?",
+			); // Set default if null
+			setPublicAccess(data.chatbots.public_access || false);
 		}
 	}, [data, loading]);
 
@@ -99,12 +109,14 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 				variables: {
 					id,
 					name: chatbotName,
+					welcome_message: welcomeMessage,
+					public_access: publicAccess,
 				},
 			});
 			toast.promise(promise, {
 				loading: "Updating...",
-				success: "Chatbot Name Successfully updated!",
-				error: "Failed to update chatbot",
+				success: "Chatbot Successfully updated!",
+				error: (err) => `Failed to update chatbot: ${err.message}`,
 			});
 		} catch (error) {
 			console.error("Failed to update chatbot:", error);
@@ -125,7 +137,7 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 
 	return (
 		<div className='px-0 md:p-10 flex-1 max-w-4xl mx-auto'>
-			<div className='md:sticky md:top-0 z-50 max-sm:max-w-sm m-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-[#2991ee]'>
+			<div className='md:top-0 z-50 max-sm:max-w-sm m-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-[#2991ee]'>
 				<h2 className='text-white text-sm font-bold'>Link to Chat</h2>
 				<p className='text-sm inline text-white'>
 					Share this link with your customers to start conversations
@@ -139,7 +151,7 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 						<Input
 							value={url}
 							readOnly
-							className='cursor-pointer bg-white'
+							className='cursor-pointer truncate bg-white'
 						/>
 					</Link>
 					<Button
@@ -154,6 +166,7 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 						<Copy className='h-4 w-4' />
 					</Button>
 				</div>
+				<EmbedInstructions chatbotId={Number(id)} />
 			</div>
 			<section className='relative mt-5 bg-white p-5 md:p-10 rounded-lg'>
 				<Button
@@ -170,15 +183,41 @@ const EditChatbot = ({params}: {params: Promise<{id: string}>}) => {
 						onSubmit={handleUpdateChatbot}
 						className='flex flex-1 space-x-2 items-center'
 					>
-						<Input
-							value={chatbotName}
-							placeholder={chatbotName}
-							className='w-full border-none bg-transparent !text-xl font-bold'
-							onChange={(e) => {
-								setChatbotName(e.target.value);
-							}}
-						/>
-						<Button type='submit' disabled={!chatbotName}>
+						<div className='grid grid-cols-2 gap-y-4'>
+							<Input
+								value={chatbotName}
+								placeholder={chatbotName}
+								className='w-full border-none bg-transparent !text-xl font-bold'
+								onChange={(e) => {
+									setChatbotName(e.target.value);
+								}}
+							/>
+							<Input
+								value={welcomeMessage}
+								onChange={(e) =>
+									setWelcomeMessage(e.target.value)
+								}
+								placeholder={welcomeMessage}
+								className='w-full'
+							/>
+							<div className='flex justify-end items-center space-x-2 col-span-2'>
+								<Switch
+									checked={publicAccess}
+									onCheckedChange={(checked) => {
+										setPublicAccess(checked);
+									}}
+									id='public-access'
+									name='public-access'
+								/>
+								<Label htmlFor='public-access'>
+									Public Access
+								</Label>
+							</div>
+						</div>
+						<Button
+							type='submit'
+							disabled={!chatbotName || !welcomeMessage}
+						>
 							Update
 						</Button>
 					</form>
