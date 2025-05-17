@@ -38,7 +38,7 @@ const ReviewSession = async ({params}: {params: Promise<{id: string}>}) => {
 			</p>
 			<h2 className='font-light mt-2'>
 				Between {name} &{" "}
-				<span className='fot-semibold'>
+				<span className='font-semibold'>
 					{guestName} {email}
 				</span>
 			</h2>
